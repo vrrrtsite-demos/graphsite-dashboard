@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GraphSite Analytics Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>GraphSite Analytics</title>
+<link id="google-fonts" rel="stylesheet" href="">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
     background: #0D0D0D;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-body, 'Inter', sans-serif);
     color: #F0F0F0;
     min-height: 100vh;
   }
@@ -18,7 +18,7 @@
   /* ── Header ── */
   #header {
     background: #111;
-    border-bottom: 1px solid #222;
+    border-bottom: 1px solid #1E1E1E;
     padding: 0 24px;
     height: 56px;
     display: flex;
@@ -28,14 +28,24 @@
     top: 0;
     z-index: 100;
   }
-  #wordmark {
+  #brand-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  #brand-logo { height: 32px; width: auto; display: block; }
+  #brand-wordmark {
     font-size: 20px;
     font-weight: 800;
     letter-spacing: -0.5px;
+    font-family: var(--font-heading, 'Inter', sans-serif);
   }
-  #wordmark span.v { color: #FF6535; }
-  #wordmark span.r { color: #F0F0F0; }
-  #wordmark span.x { color: #FF6535; }
+  #brand-tag {
+    font-size: 11px;
+    font-weight: 600;
+    color: #444;
+    font-family: var(--font-body, 'Inter', sans-serif);
+  }
   #header-right {
     display: flex;
     align-items: center;
@@ -44,7 +54,7 @@
   #sphere-label {
     font-size: 12px;
     font-weight: 600;
-    color: #888;
+    color: #666;
     background: #1A1A1A;
     border: 1px solid #2A2A2A;
     padding: 4px 12px;
@@ -53,20 +63,17 @@
   #refresh-btn {
     background: none;
     border: 1px solid #333;
-    color: #888;
+    color: #777;
     font-size: 11px;
-    font-weight: 600;
-    padding: 4px 12px;
+    font-weight: 700;
+    padding: 4px 14px;
     border-radius: 20px;
     cursor: pointer;
-    font-family: inherit;
+    font-family: var(--font-body, 'Inter', sans-serif);
     transition: all 0.15s;
   }
-  #refresh-btn:hover { border-color: #FF6535; color: #FF6535; }
-  #last-updated {
-    font-size: 11px;
-    color: #444;
-  }
+  #refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+  #last-updated { font-size: 11px; color: #444; }
 
   /* ── Main ── */
   #main {
@@ -74,32 +81,42 @@
     margin: 0 auto;
     padding: 32px 24px 60px;
   }
-
-  /* ── Page title ── */
-  #page-title {
-    margin-bottom: 28px;
-  }
+  #page-title { margin-bottom: 24px; }
   #page-title h1 {
     font-size: 22px;
-    font-weight: 700;
+    font-weight: 800;
     color: #F0F0F0;
+    font-family: var(--font-heading, 'Inter', sans-serif);
   }
-  #page-title p {
-    font-size: 13px;
+  #page-title p { font-size: 13px; color: #555; margin-top: 4px; }
+
+  /* ── Period ── */
+  #period-row { display: flex; gap: 6px; margin-bottom: 24px; }
+  .period-btn {
+    background: none;
+    border: 1px solid #2A2A2A;
     color: #555;
-    margin-top: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: var(--font-body, 'Inter', sans-serif);
+    transition: all 0.15s;
   }
+  .period-btn:hover { border-color: #444; color: #999; }
+  .period-btn.active { background: var(--accent); border-color: var(--accent); color: var(--accent-text, #fff); }
 
   /* ── KPI Cards ── */
   #kpis {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 14px;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
   }
   .kpi-card {
     background: #161616;
-    border: 1px solid #222;
+    border: 1px solid #202020;
     border-radius: 12px;
     padding: 20px 20px 18px;
     position: relative;
@@ -110,9 +127,13 @@
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 2px;
-    background: var(--accent, #FF6535);
-    opacity: 0.6;
+    background: var(--stripe, var(--accent));
+    opacity: 0.7;
   }
+  .kpi-card.c1 { --stripe: var(--accent); }
+  .kpi-card.c2 { --stripe: #4B9EFF; }
+  .kpi-card.c3 { --stripe: #3ECF8E; }
+  .kpi-card.c4 { --stripe: #A78BFA; }
   .kpi-label {
     font-size: 10px;
     font-weight: 700;
@@ -120,47 +141,34 @@
     text-transform: uppercase;
     color: #555;
     margin-bottom: 10px;
+    font-family: var(--font-heading, 'Inter', sans-serif);
   }
   .kpi-value {
-    font-size: 36px;
+    font-size: 38px;
     font-weight: 800;
     color: #F0F0F0;
     line-height: 1;
     letter-spacing: -1px;
+    font-family: var(--font-heading, 'Inter', sans-serif);
   }
-  .kpi-sub {
-    font-size: 11px;
-    color: #555;
-    margin-top: 6px;
-  }
-  .kpi-card.orange { --accent: #FF6535; }
-  .kpi-card.blue   { --accent: #4B9EFF; }
-  .kpi-card.green  { --accent: #3ECF8E; }
-  .kpi-card.purple { --accent: #A78BFA; }
+  .kpi-sub { font-size: 11px; color: #555; margin-top: 6px; }
 
   /* ── Sections ── */
   .section {
     background: #161616;
-    border: 1px solid #222;
+    border: 1px solid #202020;
     border-radius: 12px;
-    padding: 22px 22px 20px;
-    margin-bottom: 16px;
+    padding: 22px;
+    margin-bottom: 14px;
   }
   .section-title {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.8px;
     text-transform: uppercase;
     color: #555;
     margin-bottom: 16px;
-  }
-
-  /* ── Hottest Hub ── */
-  #hottest-hub-val {
-    font-size: 28px;
-    font-weight: 800;
-    color: #FF6535;
-    letter-spacing: -0.5px;
+    font-family: var(--font-heading, 'Inter', sans-serif);
   }
 
   /* ── Source bars ── */
@@ -190,9 +198,9 @@
   }
   .source-bar-fill {
     height: 100%;
-    background: #FF6535;
+    background: var(--accent);
     border-radius: 4px;
-    transition: width 0.5s ease;
+    transition: width 0.6s ease;
   }
   .source-count {
     font-size: 12px;
@@ -203,7 +211,7 @@
     flex-shrink: 0;
   }
 
-  /* ── Visitors table ── */
+  /* ── Visitors ── */
   .visitor-row {
     display: flex;
     align-items: center;
@@ -215,11 +223,13 @@
   .visitor-avatar {
     width: 32px; height: 32px;
     border-radius: 50%;
-    background: #222;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 700; color: #FF6535;
-    flex-shrink: 0;
+    background: #1E1E1E;
     border: 1px solid #2A2A2A;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+    font-family: var(--font-heading, 'Inter', sans-serif);
   }
   .visitor-info { flex: 1; min-width: 0; }
   .visitor-email {
@@ -230,38 +240,25 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .visitor-anon {
-    font-size: 13px;
-    font-weight: 500;
-    color: #444;
-    font-style: italic;
-  }
-  .visitor-meta {
-    font-size: 11px;
-    color: #555;
-    margin-top: 2px;
-  }
+  .visitor-anon { font-size: 13px; font-weight: 500; color: #444; font-style: italic; }
+  .visitor-meta { font-size: 11px; color: #555; margin-top: 2px; }
   .visitor-hub {
     font-size: 11px;
-    font-weight: 600;
-    color: #FF6535;
-    background: rgba(255,101,53,0.1);
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: 10px;
-    padding: 2px 8px;
+    padding: 2px 9px;
     flex-shrink: 0;
     white-space: nowrap;
-    max-width: 120px;
+    max-width: 130px;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .visitor-events {
-    font-size: 11px;
-    font-weight: 700;
-    color: #555;
-    flex-shrink: 0;
-  }
+  .visitor-events { font-size: 11px; font-weight: 700; color: #555; flex-shrink: 0; }
 
-  /* ── Empty / loading states ── */
+  /* ── States ── */
   .empty {
     font-size: 13px;
     color: #444;
@@ -274,23 +271,22 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 50vh;
+    min-height: 40vh;
     gap: 12px;
     color: #444;
     font-size: 13px;
   }
   .spinner {
-    width: 28px; height: 28px;
+    width: 26px; height: 26px;
     border: 2px solid #222;
-    border-top-color: #FF6535;
+    border-top-color: var(--accent);
     border-radius: 50%;
     animation: spin 0.7s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-
   #error-msg {
-    background: rgba(255,50,50,0.07);
-    border: 1px solid rgba(255,50,50,0.2);
+    background: rgba(255,50,50,0.06);
+    border: 1px solid rgba(255,50,50,0.18);
     border-radius: 10px;
     padding: 16px 20px;
     font-size: 13px;
@@ -298,93 +294,125 @@
     text-align: center;
   }
 
-  /* ── Period selector ── */
-  #period-row {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 24px;
-  }
-  .period-btn {
-    background: none;
-    border: 1px solid #2A2A2A;
-    color: #555;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 5px 14px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-family: inherit;
-    transition: all 0.15s;
-  }
-  .period-btn:hover { border-color: #444; color: #999; }
-  .period-btn.active { background: #FF6535; border-color: #FF6535; color: #fff; }
-
-  /* ── Responsive ── */
   @media (max-width: 600px) {
     #main { padding: 20px 16px 40px; }
-    .kpi-value { font-size: 28px; }
+    .kpi-value { font-size: 30px; }
     .section { padding: 16px; }
+    #brand-tag { display: none; }
   }
 </style>
 </head>
 <body>
 
 <div id="header">
-  <div id="wordmark">
-    <span class="v">V</span><span class="r">rrrt</span><span class="x">!</span>
-    <span style="font-size:12px;font-weight:500;color:#444;margin-left:8px;">GraphSite Analytics</span>
+  <div id="brand-area">
+    <!-- populated by JS -->
   </div>
   <div id="header-right">
-    <span id="sphere-label">Loading...</span>
+    <span id="sphere-label"></span>
     <span id="last-updated"></span>
     <button id="refresh-btn" onclick="loadData()">Refresh</button>
   </div>
 </div>
 
 <div id="main">
-
   <div id="page-title">
-    <h1 id="title-text">Sphere Dashboard</h1>
+    <h1 id="title-text"></h1>
     <p id="subtitle-text">Real-time engagement data from your GraphSite sphere</p>
   </div>
-
   <div id="period-row">
     <button class="period-btn active" data-days="1" onclick="setPeriod(1)">Today</button>
     <button class="period-btn" data-days="7" onclick="setPeriod(7)">7 days</button>
     <button class="period-btn" data-days="30" onclick="setPeriod(30)">30 days</button>
     <button class="period-btn" data-days="90" onclick="setPeriod(90)">All time</button>
   </div>
-
   <div id="content">
-    <div id="loading-overlay">
-      <div class="spinner"></div>
-      <span>Loading analytics...</span>
-    </div>
+    <div id="loading-overlay"><div class="spinner"></div><span>Loading...</span></div>
   </div>
-
 </div>
 
 <script>
   const API = 'https://vrrrt-api-production.up.railway.app';
 
-  // Read sphere from URL param — default to attooh-sphere for demo
-  const params = new URLSearchParams(window.location.search);
-  const SPHERE_ID = params.get('sphere') || 'attooh-sphere';
-  let currentDays = parseInt(params.get('days') || '1');
-
-  // Set sphere label in header
-  document.getElementById('sphere-label').textContent = SPHERE_ID;
-
-  // Set title
-  const titleMap = {
-    'attooh-sphere':   'attooh! Sphere',
-    'inspired-sphere': 'Inspired Living SA Sphere',
-    'maya-sphere':     'Maya on Money Sphere',
-    'sam-sphere':      'SAM Sphere',
+  // ── Brand config per sphere ──────────────────────────────────────────
+  const BRANDS = {
+    'attooh-sphere': {
+      name:        'attooh!',
+      title:       'attooh! — Sphere Analytics',
+      accent:      '#9cd31e',
+      accentText:  '#1a3000',
+      logoUrl:     'https://images.leadconnectorhq.com/image/f_webp/q_80/r_1200/u_https://assets.cdn.filesafe.space/EnEfD8EkdmRMu6E68Llz/media/872362e7-eb84-43b4-970e-86ba9813aaef.png',
+      fontHeading: 'Montserrat',
+      fontBody:    'Lato',
+      googleFonts: 'https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Lato:wght@400;700&display=swap',
+    },
+    'inspired-sphere': {
+      name:        'Inspired Living SA',
+      title:       'Inspired Living — Sphere Analytics',
+      accent:      '#8AB4BA',
+      accentText:  '#fff',
+      fontHeading: 'Fira Sans',
+      fontBody:    'Fira Sans',
+      googleFonts: 'https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;600;700;800&display=swap',
+    },
+    'maya-sphere': {
+      name:        'Maya on Money',
+      title:       'Maya on Money — Sphere Analytics',
+      accent:      '#E8A020',
+      accentText:  '#fff',
+      fontHeading: 'Playfair Display',
+      fontBody:    'Lato',
+      googleFonts: 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Lato:wght@400;700&display=swap',
+    },
   };
-  document.getElementById('title-text').textContent =
-    (titleMap[SPHERE_ID] || SPHERE_ID) + ' — Analytics';
 
+  const DEFAULT_BRAND = {
+    name:        'Vrrrt!',
+    title:       'Sphere Analytics',
+    accent:      '#FF6535',
+    accentText:  '#fff',
+    fontHeading: 'Inter',
+    fontBody:    'Inter',
+    googleFonts: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap',
+  };
+
+  // ── Init ─────────────────────────────────────────────────────────────
+  const urlParams = new URLSearchParams(window.location.search);
+  const SPHERE_ID = urlParams.get('sphere') || 'attooh-sphere';
+  const brand = BRANDS[SPHERE_ID] || DEFAULT_BRAND;
+  let currentDays = 1;
+
+  // Apply brand CSS vars
+  const root = document.documentElement;
+  root.style.setProperty('--accent', brand.accent);
+  root.style.setProperty('--accent-text', brand.accentText);
+  root.style.setProperty('--font-heading', `'${brand.fontHeading}', sans-serif`);
+  root.style.setProperty('--font-body', `'${brand.fontBody}', sans-serif`);
+
+  // Load fonts
+  if (brand.googleFonts) {
+    document.getElementById('google-fonts').href = brand.googleFonts;
+  }
+
+  // Brand header
+  const brandArea = document.getElementById('brand-area');
+  if (brand.logoUrl) {
+    brandArea.innerHTML = `
+      <img id="brand-logo" src="${brand.logoUrl}" alt="${brand.name}" onerror="this.style.display='none';document.getElementById('brand-fallback').style.display='block'">
+      <span id="brand-fallback" style="display:none;font-size:18px;font-weight:800;color:var(--accent);font-family:var(--font-heading)">${brand.name}</span>
+      <span id="brand-tag">Analytics Dashboard</span>`;
+  } else {
+    brandArea.innerHTML = `
+      <span id="brand-wordmark" style="color:var(--accent);font-family:var(--font-heading)">${brand.name}</span>
+      <span id="brand-tag">Analytics Dashboard</span>`;
+  }
+
+  // Titles
+  document.getElementById('sphere-label').textContent = SPHERE_ID;
+  document.getElementById('title-text').textContent = brand.title;
+  document.title = brand.title;
+
+  // ── Helpers ──────────────────────────────────────────────────────────
   function setPeriod(days) {
     currentDays = days;
     document.querySelectorAll('.period-btn').forEach(b => {
@@ -395,109 +423,107 @@
 
   function formatDate(iso) {
     if (!iso) return '—';
-    const d = new Date(iso);
-    return d.toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    return new Date(iso).toLocaleDateString('en-ZA', {
+      day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+    });
   }
 
-  function initials(email) {
-    if (!email) return '?';
-    return email[0].toUpperCase();
+  function initial(email) {
+    return (email || '?')[0].toUpperCase();
   }
 
+  // ── Render ───────────────────────────────────────────────────────────
   function renderDashboard(data) {
     const c = document.getElementById('content');
 
-    // Source bars
     const sources = Object.entries(data.by_source || {}).sort((a, b) => b[1] - a[1]);
     const maxSrc = sources[0]?.[1] || 1;
-    const srcBars = sources.length === 0
+
+    const srcHtml = sources.length === 0
       ? '<div class="empty">No source data yet</div>'
-      : sources.map(([src, count]) => `
+      : sources.map(([src, n]) => `
           <div class="source-row">
             <div class="source-name">${src}</div>
             <div class="source-bar-track">
-              <div class="source-bar-fill" style="width:${Math.round((count/maxSrc)*100)}%"></div>
+              <div class="source-bar-fill" style="width:${Math.round((n/maxSrc)*100)}%"></div>
             </div>
-            <div class="source-count">${count}</div>
+            <div class="source-count">${n}</div>
           </div>`).join('');
 
-    // Visitors
     const visitors = data.hot_visitors || [];
-    const visitorRows = visitors.length === 0
-      ? '<div class="empty">No visitors identified yet — share the sphere to get started</div>'
+    const visHtml = visitors.length === 0
+      ? '<div class="empty">No visitors identified yet — share the sphere link to get started</div>'
       : visitors.map(v => `
           <div class="visitor-row">
-            <div class="visitor-avatar">${initials(v.email)}</div>
+            <div class="visitor-avatar">${initial(v.email)}</div>
             <div class="visitor-info">
               ${v.email
                 ? `<div class="visitor-email">${v.email}</div>`
                 : `<div class="visitor-anon">Anonymous visitor</div>`}
               <div class="visitor-meta">Last seen ${formatDate(v.last_seen)}</div>
             </div>
-            ${v.top_hub ? `<div class="visitor-hub">${v.top_hub}</div>` : ''}
+            ${v.top_hub ? `<div class="visitor-hub">${v.top_hub.replace(/-/g,' ')}</div>` : ''}
             <div class="visitor-events">${v.event_count} events</div>
           </div>`).join('');
 
-    const hottestDisplay = data.hottest_hub
-      ? data.hottest_hub.replace(/-/g, ' ')
-      : '—';
+    const hottest = data.hottest_hub ? data.hottest_hub.replace(/-/g, ' ') : '—';
+    const hottestSize = hottest.length > 12 ? '18px' : '28px';
 
     c.innerHTML = `
       <div id="kpis">
-        <div class="kpi-card orange">
+        <div class="kpi-card c1">
           <div class="kpi-label">Total Visitors</div>
           <div class="kpi-value">${data.total_visitors ?? 0}</div>
           <div class="kpi-sub">unique sessions</div>
         </div>
-        <div class="kpi-card blue">
+        <div class="kpi-card c2">
           <div class="kpi-label">Deeply Engaged</div>
           <div class="kpi-value">${data.deeply_engaged ?? 0}</div>
           <div class="kpi-sub">5+ interactions</div>
         </div>
-        <div class="kpi-card green">
+        <div class="kpi-card c3">
           <div class="kpi-label">Emails Captured</div>
           <div class="kpi-value">${data.emails_captured ?? 0}</div>
           <div class="kpi-sub">identified visitors</div>
         </div>
-        <div class="kpi-card purple">
+        <div class="kpi-card c4">
           <div class="kpi-label">Hottest Topic</div>
-          <div class="kpi-value" style="font-size:20px;letter-spacing:0;line-height:1.2;padding-top:4px;">${hottestDisplay}</div>
+          <div class="kpi-value" style="font-size:${hottestSize};letter-spacing:0;line-height:1.2;padding-top:4px;">${hottest}</div>
           <div class="kpi-sub">most clicked hub</div>
         </div>
       </div>
 
       <div class="section">
         <div class="section-title">Traffic Sources</div>
-        ${srcBars}
+        ${srcHtml}
       </div>
 
       <div class="section">
         <div class="section-title">Identified Visitors</div>
-        ${visitorRows}
+        ${visHtml}
       </div>
     `;
   }
 
+  // ── Fetch ─────────────────────────────────────────────────────────────
   async function loadData() {
-    const c = document.getElementById('content');
-    c.innerHTML = `<div id="loading-overlay"><div class="spinner"></div><span>Loading...</span></div>`;
-
-    const lu = document.getElementById('last-updated');
-    lu.textContent = '';
+    document.getElementById('content').innerHTML =
+      `<div id="loading-overlay"><div class="spinner"></div><span>Loading...</span></div>`;
+    document.getElementById('last-updated').textContent = '';
 
     try {
       const res = await fetch(`${API}/analytics/dashboard/${SPHERE_ID}?days=${currentDays}`);
-      if (!res.ok) throw new Error(`API returned ${res.status}`);
+      if (!res.ok) throw new Error(`API ${res.status}`);
       const data = await res.json();
       renderDashboard(data);
-      lu.textContent = 'Updated ' + new Date().toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('last-updated').textContent =
+        'Updated ' + new Date().toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' });
     } catch (err) {
-      c.innerHTML = `<div id="error-msg">Could not load data — ${err.message}<br><br>Check that the API is running and CORS allows this origin.</div>`;
-      console.error(err);
+      document.getElementById('content').innerHTML =
+        `<div id="error-msg">Could not load data — ${err.message}</div>`;
     }
   }
 
-  // Initial load
   loadData();
 </script>
 </body>
