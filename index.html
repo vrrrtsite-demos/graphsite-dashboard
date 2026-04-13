@@ -51,6 +51,14 @@
     transition: all 0.15s;
   }
   #refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+  #live-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
+    animation: pulse 2s ease-in-out infinite; flex-shrink: 0;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.4; transform: scale(0.85); }
+  }
   #last-updated { font-size: 11px; color: var(--text-faint); }
 
   /* ── Main ── */
@@ -177,6 +185,7 @@
   <div id="brand-area"></div>
   <div id="header-right">
     <span id="sphere-label"></span>
+    <div id="live-dot" title="Auto-refreshing every 15s"></div>
     <span id="last-updated"></span>
     <button id="refresh-btn" onclick="loadData()">Refresh</button>
   </div>
@@ -413,6 +422,7 @@
   }
 
   loadData();
+  setInterval(loadData, 15000);
 </script>
 </body>
 </html>
