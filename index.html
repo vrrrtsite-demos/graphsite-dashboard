@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GraphSite Analytics Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0D0D0D;
+    font-family: 'Inter', sans-serif;
+    color: #F0F0F0;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  #header {
+    background: #111;
+    border-bottom: 1px solid #222;
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  #wordmark {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  #wordmark span.v { color: #FF6535; }
+  #wordmark span.r { color: #F0F0F0; }
+  #wordmark span.x { color: #FF6535; }
+  #header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  #sphere-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+    background: #1A1A1A;
+    border: 1px solid #2A2A2A;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+  #refresh-btn {
+    background: none;
+    border: 1px solid #333;
+    color: #888;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  #refresh-btn:hover { border-color: #FF6535; color: #FF6535; }
+  #last-updated {
+    font-size: 11px;
+    color: #444;
+  }
+
+  /* ── Main ── */
+  #main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+
+  /* ── Page title ── */
+  #page-title {
+    margin-bottom: 28px;
+  }
+  #page-title h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #F0F0F0;
+  }
+  #page-title p {
+    font-size: 13px;
+    color: #555;
+    margin-top: 4px;
+  }
+
+  /* ── KPI Cards ── */
+  #kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .kpi-card {
+    background: #161616;
+    border: 1px solid #222;
+    border-radius: 12px;
+    padding: 20px 20px 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent, #FF6535);
+    opacity: 0.6;
+  }
+  .kpi-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #555;
+    margin-bottom: 10px;
+  }
+  .kpi-value {
+    font-size: 36px;
+    font-weight: 800;
+    color: #F0F0F0;
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+  .kpi-sub {
+    font-size: 11px;
+    color: #555;
+    margin-top: 6px;
+  }
+  .kpi-card.orange { --accent: #FF6535; }
+  .kpi-card.blue   { --accent: #4B9EFF; }
+  .kpi-card.green  { --accent: #3ECF8E; }
+  .kpi-card.purple { --accent: #A78BFA; }
+
+  /* ── Sections ── */
+  .section {
+    background: #161616;
+    border: 1px solid #222;
+    border-radius: 12px;
+    padding: 22px 22px 20px;
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #555;
+    margin-bottom: 16px;
+  }
+
+  /* ── Hottest Hub ── */
+  #hottest-hub-val {
+    font-size: 28px;
+    font-weight: 800;
+    color: #FF6535;
+    letter-spacing: -0.5px;
+  }
+
+  /* ── Source bars ── */
+  .source-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .source-row:last-child { margin-bottom: 0; }
+  .source-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+    width: 90px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .source-bar-track {
+    flex: 1;
+    background: #1F1F1F;
+    border-radius: 4px;
+    height: 8px;
+    overflow: hidden;
+  }
+  .source-bar-fill {
+    height: 100%;
+    background: #FF6535;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+  .source-count {
+    font-size: 12px;
+    font-weight: 700;
+    color: #F0F0F0;
+    width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ── Visitors table ── */
+  .visitor-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #1C1C1C;
+  }
+  .visitor-row:last-child { border-bottom: none; }
+  .visitor-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: #222;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: #FF6535;
+    flex-shrink: 0;
+    border: 1px solid #2A2A2A;
+  }
+  .visitor-info { flex: 1; min-width: 0; }
+  .visitor-email {
+    font-size: 13px;
+    font-weight: 600;
+    color: #E0E0E0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .visitor-anon {
+    font-size: 13px;
+    font-weight: 500;
+    color: #444;
+    font-style: italic;
+  }
+  .visitor-meta {
+    font-size: 11px;
+    color: #555;
+    margin-top: 2px;
+  }
+  .visitor-hub {
+    font-size: 11px;
+    font-weight: 600;
+    color: #FF6535;
+    background: rgba(255,101,53,0.1);
+    border-radius: 10px;
+    padding: 2px 8px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .visitor-events {
+    font-size: 11px;
+    font-weight: 700;
+    color: #555;
+    flex-shrink: 0;
+  }
+
+  /* ── Empty / loading states ── */
+  .empty {
+    font-size: 13px;
+    color: #444;
+    text-align: center;
+    padding: 24px 0;
+    font-style: italic;
+  }
+  #loading-overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+    gap: 12px;
+    color: #444;
+    font-size: 13px;
+  }
+  .spinner {
+    width: 28px; height: 28px;
+    border: 2px solid #222;
+    border-top-color: #FF6535;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  #error-msg {
+    background: rgba(255,50,50,0.07);
+    border: 1px solid rgba(255,50,50,0.2);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 13px;
+    color: #FF6060;
+    text-align: center;
+  }
+
+  /* ── Period selector ── */
+  #period-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+  .period-btn {
+    background: none;
+    border: 1px solid #2A2A2A;
+    color: #555;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .period-btn:hover { border-color: #444; color: #999; }
+  .period-btn.active { background: #FF6535; border-color: #FF6535; color: #fff; }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    #main { padding: 20px 16px 40px; }
+    .kpi-value { font-size: 28px; }
+    .section { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div id="wordmark">
+    <span class="v">V</span><span class="r">rrrt</span><span class="x">!</span>
+    <span style="font-size:12px;font-weight:500;color:#444;margin-left:8px;">GraphSite Analytics</span>
+  </div>
+  <div id="header-right">
+    <span id="sphere-label">Loading...</span>
+    <span id="last-updated"></span>
+    <button id="refresh-btn" onclick="loadData()">Refresh</button>
+  </div>
+</div>
+
+<div id="main">
+
+  <div id="page-title">
+    <h1 id="title-text">Sphere Dashboard</h1>
+    <p id="subtitle-text">Real-time engagement data from your GraphSite sphere</p>
+  </div>
+
+  <div id="period-row">
+    <button class="period-btn active" data-days="1" onclick="setPeriod(1)">Today</button>
+    <button class="period-btn" data-days="7" onclick="setPeriod(7)">7 days</button>
+    <button class="period-btn" data-days="30" onclick="setPeriod(30)">30 days</button>
+    <button class="period-btn" data-days="90" onclick="setPeriod(90)">All time</button>
+  </div>
+
+  <div id="content">
+    <div id="loading-overlay">
+      <div class="spinner"></div>
+      <span>Loading analytics...</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const API = 'https://vrrrt-api-production.up.railway.app';
+
+  // Read sphere from URL param — default to attooh-sphere for demo
+  const params = new URLSearchParams(window.location.search);
+  const SPHERE_ID = params.get('sphere') || 'attooh-sphere';
+  let currentDays = parseInt(params.get('days') || '1');
+
+  // Set sphere label in header
+  document.getElementById('sphere-label').textContent = SPHERE_ID;
+
+  // Set title
+  const titleMap = {
+    'attooh-sphere':   'attooh! Sphere',
+    'inspired-sphere': 'Inspired Living SA Sphere',
+    'maya-sphere':     'Maya on Money Sphere',
+    'sam-sphere':      'SAM Sphere',
+  };
+  document.getElementById('title-text').textContent =
+    (titleMap[SPHERE_ID] || SPHERE_ID) + ' — Analytics';
+
+  function setPeriod(days) {
+    currentDays = days;
+    document.querySelectorAll('.period-btn').forEach(b => {
+      b.classList.toggle('active', parseInt(b.dataset.days) === days);
+    });
+    loadData();
+  }
+
+  function formatDate(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  }
+
+  function initials(email) {
+    if (!email) return '?';
+    return email[0].toUpperCase();
+  }
+
+  function renderDashboard(data) {
+    const c = document.getElementById('content');
+
+    // Source bars
+    const sources = Object.entries(data.by_source || {}).sort((a, b) => b[1] - a[1]);
+    const maxSrc = sources[0]?.[1] || 1;
+    const srcBars = sources.length === 0
+      ? '<div class="empty">No source data yet</div>'
+      : sources.map(([src, count]) => `
+          <div class="source-row">
+            <div class="source-name">${src}</div>
+            <div class="source-bar-track">
+              <div class="source-bar-fill" style="width:${Math.round((count/maxSrc)*100)}%"></div>
+            </div>
+            <div class="source-count">${count}</div>
+          </div>`).join('');
+
+    // Visitors
+    const visitors = data.hot_visitors || [];
+    const visitorRows = visitors.length === 0
+      ? '<div class="empty">No visitors identified yet — share the sphere to get started</div>'
+      : visitors.map(v => `
+          <div class="visitor-row">
+            <div class="visitor-avatar">${initials(v.email)}</div>
+            <div class="visitor-info">
+              ${v.email
+                ? `<div class="visitor-email">${v.email}</div>`
+                : `<div class="visitor-anon">Anonymous visitor</div>`}
+              <div class="visitor-meta">Last seen ${formatDate(v.last_seen)}</div>
+            </div>
+            ${v.top_hub ? `<div class="visitor-hub">${v.top_hub}</div>` : ''}
+            <div class="visitor-events">${v.event_count} events</div>
+          </div>`).join('');
+
+    const hottestDisplay = data.hottest_hub
+      ? data.hottest_hub.replace(/-/g, ' ')
+      : '—';
+
+    c.innerHTML = `
+      <div id="kpis">
+        <div class="kpi-card orange">
+          <div class="kpi-label">Total Visitors</div>
+          <div class="kpi-value">${data.total_visitors ?? 0}</div>
+          <div class="kpi-sub">unique sessions</div>
+        </div>
+        <div class="kpi-card blue">
+          <div class="kpi-label">Deeply Engaged</div>
+          <div class="kpi-value">${data.deeply_engaged ?? 0}</div>
+          <div class="kpi-sub">5+ interactions</div>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-label">Emails Captured</div>
+          <div class="kpi-value">${data.emails_captured ?? 0}</div>
+          <div class="kpi-sub">identified visitors</div>
+        </div>
+        <div class="kpi-card purple">
+          <div class="kpi-label">Hottest Topic</div>
+          <div class="kpi-value" style="font-size:20px;letter-spacing:0;line-height:1.2;padding-top:4px;">${hottestDisplay}</div>
+          <div class="kpi-sub">most clicked hub</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Traffic Sources</div>
+        ${srcBars}
+      </div>
+
+      <div class="section">
+        <div class="section-title">Identified Visitors</div>
+        ${visitorRows}
+      </div>
+    `;
+  }
+
+  async function loadData() {
+    const c = document.getElementById('content');
+    c.innerHTML = `<div id="loading-overlay"><div class="spinner"></div><span>Loading...</span></div>`;
+
+    const lu = document.getElementById('last-updated');
+    lu.textContent = '';
+
+    try {
+      const res = await fetch(`${API}/analytics/dashboard/${SPHERE_ID}?days=${currentDays}`);
+      if (!res.ok) throw new Error(`API returned ${res.status}`);
+      const data = await res.json();
+      renderDashboard(data);
+      lu.textContent = 'Updated ' + new Date().toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' });
+    } catch (err) {
+      c.innerHTML = `<div id="error-msg">Could not load data — ${err.message}<br><br>Check that the API is running and CORS allows this origin.</div>`;
+      console.error(err);
+    }
+  }
+
+  // Initial load
+  loadData();
+</script>
+</body>
+</html>
